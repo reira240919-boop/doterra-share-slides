@@ -1,0 +1,24 @@
+# 依存・ビルド
+node_modules/
+.next/
+.next-mine/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# 秘密情報（合言葉・APIキー）。例のファイルだけは残す
+.env
+.env*.local
+.env.production
+.env.development
+
+# 公開しない元データ（体質の PDF と女性イラスト）
+*.pdf
+女性イラスト/
+デザイン見本/
+内容の流れ_見本/
+private/
+
+# その他
+.DS_Store
+.vercel

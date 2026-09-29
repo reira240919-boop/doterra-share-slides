@@ -1,0 +1,33 @@
+{
+  "name": "doterra-share-slides",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3200",
+    "dev:mine": "NEXT_PUBLIC_DATA_MODE=mine next dev -p 3202 -H 127.0.0.1",
+    "build": "next build",
+    "build:mine": "NEXT_PUBLIC_DATA_MODE=mine next build",
+    "start": "next start -p 3200",
+    "start:mine": "NEXT_PUBLIC_DATA_MODE=mine next start -p 3201 -H 127.0.0.1",
+    "mine:update": "npm run build:mine && launchctl kickstart -k gui/$(id -u)/com.m39.doterra-slides-mine",
+    "typecheck": "tsc --noEmit",
+    "build:knowledge": "node --env-file-if-exists=.env.local scripts/build-knowledge.mts",
+    "build:sample": "tsx scripts/make-sample.mts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.129.0",
+    "next": "^16.3.6",
+    "openai": "^7.23.0",
+    "pptxgenjs": "^4.0.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,22 @@
+# 公開用（Vercel）は見本だけ。見本は data/sample-deck.json に入っているので、下のものは載せない
+
+# 体質の PDF・女性イラスト・デザインや内容の見本（公開しない元データ）
+*.pdf
+女性イラスト/
+デザイン見本/
+内容の流れ_見本/
+
+# 自分用だけで使うもの（資料の文字データ、ミネラル資料、イラストの小さいコピー、ボトル写真）
+private/
+
+# 秘密情報はファイルでは上げない（公開用はキーを使わない。合言葉だけ Vercel の環境変数に登録する）
+.env
+.env*.local
+.env.production
+.env.development
+
+# 手元だけのもの
+node_modules/
+.next/
+.next-mine/
+.DS_Store
