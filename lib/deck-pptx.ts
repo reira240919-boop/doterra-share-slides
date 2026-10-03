@@ -143,11 +143,11 @@ function underlinedHeading(ctx: Ctx, heading: string, y: number, size = 30) {
 }
 
 // 色で塗った小さな帯（真ん中、白い文字）
-function centerPill(ctx: Ctx, label: string, y: number, size = 24) {
+function centerPill(ctx: Ctx, label: string, y: number) {
   if (!label) return;
   // イラストに重ならない幅まで
   // 長い文は、帯に収まるまで文字を小さくする
-  const fs = Math.max(16, Math.min(size, 700 / (textWidth(label, 1, 0.15) || 1)));
+  const fs = Math.max(16, Math.min(24, 700 / (textWidth(label, 1, 0.15) || 1)));
   const w = Math.min(textWidth(label, fs, 0.18) + 80, 760);
   box(ctx, (1280 - w) / 2, y, w, 52, ctx.pal.band);
   text(ctx, label, (1280 - w) / 2, y, w, 52, { size: fs, color: "FFFFFF", align: "center", valign: "middle", spacing: 0.15 });

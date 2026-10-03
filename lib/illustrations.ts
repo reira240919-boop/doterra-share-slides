@@ -18,6 +18,9 @@ export type IllustrationInfo = {
 const DIR = path.join(process.cwd(), "private", "illustrations");
 const LIST = path.join(process.cwd(), "private", "illustrations.json");
 
+// 人が描かれている絵か（四季のアイコンや花だけの絵は「人物なし」）
+export const hasPerson = (x: IllustrationInfo) => !x.tags.includes("人物なし");
+
 export async function loadIllustrationList(): Promise<IllustrationInfo[]> {
   try {
     const list = JSON.parse(await readFile(LIST, "utf8")) as IllustrationInfo[];
@@ -80,7 +83,7 @@ export function pickMissingIllustrations(
       return tagScore * 10 + seasonScore;
     };
     const best = list
-      .filter((x) => !used.has(x.id) && !x.tags.includes("人物なし") && (x.season === want || x.season === "どの季節でも"))
+      .filter((x) => !used.has(x.id) && hasPerson(x) && (x.season === want || x.season === "どの季節でも"))
       .map((x) => ({ x, s: score(x) }))
       .filter((c) => c.s > 0)
       .sort((a, b) => b.s - a.s)[0]?.x;

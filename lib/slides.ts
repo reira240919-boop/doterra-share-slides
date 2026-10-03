@@ -8,7 +8,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { DECK_LAYOUTS, DECK_TOPICS, type DeckLayout, type DeckSlide, type DeckTopic } from "./deck";
-import type { IllustrationInfo } from "./illustrations";
+import { hasPerson, type IllustrationInfo } from "./illustrations";
 import type { Excerpt } from "./knowledge";
 import type { BlogResearch } from "./mineral-research";
 import type { SeasonInfo } from "./season";
@@ -127,7 +127,7 @@ const SYSTEM = `あなたは、ドテラのシェア会で映すスライドの�
 - photoRow（上の帯＋写真を横に並べる）：heading＝上の帯の言葉、lead、items 3〜6（label＝名前、text＝ひとこと、photo＝写真の内容）、band＝下の一文、highlight＝band の中で色を変える言葉。食材の紹介に。
 - headerCards（色のラベル＋色の見出し付きカード）：section＝ラベルの言葉、heading＝小見出し（空でもよい）、highlight、items 2〜4（label＝カードの見出し、text＝説明3行）、band＝下の一文。
 - photoFeature（大きな写真＋右に箇条書き＋下の帯）：heading＝見出しの一文、highlight、photo＝大きな写真の内容、items 3〜5（label のみ）、lead＝説明2行、band＝下の帯。
-- productCards（商品写真＋番号付きカード＋色の帯）：heading、highlight、lead、section＝キャッチの一文、photo＝「〇〇の商品写真（キャンバで入れる）」、items 2〜3（label＝場面、text＝使い方3行、photo＝その場面の写真の内容）、band＝色の帯の2行。POM やミネラルの取り入れ方に。
+- productCards（商品写真＋番号付きカード＋色の帯）：heading、highlight、lead、section＝キャッチの一文、photo＝「〇〇の商品写真（キャンバで入れる）」、items 2〜3（label＝場面、text＝使い方3行、photo＝その場面の写真の内容）、band＝色の帯の2行。ミネラルの取り入れ方に（POM は下の「今月のPOM」の決まりに従う）。
 - labelNumbered（ラベル＋番号付きの文＋強調の一文＋写真）：heading＝上のラベル、items 3〜4（label＝番号の後ろに入る文。25文字くらいまで、改行なし、番号は付けない）、lead＝真ん中の強調の一文、section＝下のラベル、band＝下の番号付きの文を3つ（\\n で区切る）、photo＝写真の内容。
 - checklist（タイプ別のチェック欄）：heading、highlight、lead、items 2〜3（label＝タイプ名、text＝チェック項目4つを \\n で区切る）、band。
 - keyMessage（大きな一文＋言葉を丸で強調）：section＝ラベル、lead＝説明2行、heading＝大きな一文（例「秋の不調のカギは」）、highlight、items 2〜3（label＝丸に入る1〜4文字の言葉、text＝下のひとこと2行）、band＝下の一文。
@@ -276,7 +276,8 @@ function checkOutput(out: Output, pom: string): WordingIssue[] {
     });
   }
   const pomPages = out.slides.filter((s) => s.topic === "pom");
-  if (pomPages.length !== 1 || pomPages[0].layout !== "productCards") {
+  // POM のページが無いときは、上の「必ず入れるページ」の確認で伝わる
+  if (pomPages.length > 1 || (pomPages[0] && pomPages[0].layout !== "productCards")) {
     issues.push({ slide: "全体", text: "今月のPOMのページ", reason: "POM のページは1枚だけにし、型は productCards にする" });
   }
   const used = out.slides.map((s) => s.illustration).filter(Boolean);
@@ -314,12 +315,15 @@ function stripNumber(text: string): string {
   return text.trim().replace(/^([①-⑳]\s*|[0-9０-９]{1,2}[.．、)）]\s*)/, "");
 }
 
-function toSlides(out: Output, illustrationIds: Set<string>): GeneratedSlide[] {
+function toSlides(out: Output, illustrations: IllustrationInfo[]): GeneratedSlide[] {
+  const byId = new Map(illustrations.map((x) => [x.id, x]));
   const seen = new Set<string>();
   return out.slides.map((s) => {
     const isCover = s.layout === "coverFrame" || s.layout === "coverSoft";
     // 同じ絵が2回選ばれていたら、2回目は使わない
-    const usable = s.layout !== "checklist" && illustrationIds.has(s.illustration) && !seen.has(s.illustration);
+    // 表紙には人のいない絵（四季のアイコンなど）を使わない。空にすると、あとで女性イラストを補う
+    const info = byId.get(s.illustration);
+    const usable = s.layout !== "checklist" && info !== undefined && !(isCover && !hasPerson(info)) && !seen.has(s.illustration);
     const illustrationId = usable ? s.illustration : "";
     if (illustrationId) seen.add(illustrationId);
     return {
@@ -404,5 +408,5 @@ export async function generateSlides(params: {
     issues = checkOutput(output, params.pom);
   }
 
-  return { slides: toSlides(output, new Set(ids)), issues };
+  return { slides: toSlides(output, params.illustrations), issues };
 }

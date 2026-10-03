@@ -80,12 +80,6 @@ export async function POST(request: Request) {
       year, month, pom, season, excerpts, blog, mineralNotes, illustrations,
     });
 
-    // 表紙には人のいない絵（四季のアイコンなど）を使わない。外して、下で女性イラストを補う
-    const noPerson = new Set(illustrations.filter((x) => x.tags.includes("人物なし")).map((x) => x.id));
-    generated.forEach((s, i) => {
-      if (s.topic === "cover" && noPerson.has(s.illustrationId)) generated[i] = { ...s, illustrationId: "" };
-    });
-
     // AI が選んだ女性イラストだけを読み込んで付ける（URL は作らず、この返事の中だけで渡す）
     // イラスト用の場所がある型で、AI が絵を選ばなかったページには、内容に合う絵を補う
     for (const [i, id] of pickMissingIllustrations(generated, illustrations, season.season)) {
