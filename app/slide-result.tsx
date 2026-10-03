@@ -34,7 +34,7 @@ function Highlighted({ text, word }: { text: string; word: string }) {
 
 // PowerPoint を担当者のパソコンに保存するボタン（F-06）
 // Chrome では、選んだフォルダ（デスクトップの「ドテラスライド」）の中の年月フォルダに保存する
-function SavePptx({ result }: { result: GenerateResponse }) {
+function SavePptx({ result, photoProgress }: { result: GenerateResponse; photoProgress: PhotoProgress }) {
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState("");
   const [error, setError] = useState("");
@@ -48,8 +48,11 @@ function SavePptx({ result }: { result: GenerateResponse }) {
     savedFolderName().then(setFolder);
   }, []);
 
+  // 写真を作っている間は保存させない（できていない写真が点線の枠のまま残るため）
+  const photosRunning = photoProgress.running;
+
   async function handleSave() {
-    if (saving) return;
+    if (saving || photosRunning) return;
     setSaving(true);
     setDone("");
     setError("");
@@ -88,8 +91,12 @@ function SavePptx({ result }: { result: GenerateResponse }) {
 
   return (
     <div className="save-box">
-      <button type="button" onClick={handleSave} disabled={saving}>
-        {saving ? "PowerPoint を保存しています…" : `PowerPoint を保存（${result.slides.length}枚）`}
+      <button type="button" onClick={handleSave} disabled={saving || photosRunning}>
+        {saving
+          ? "PowerPoint を保存しています…"
+          : photosRunning
+            ? `写真ができるまでお待ちください（${photoProgress.done + photoProgress.failed}/${photoProgress.total}）`
+            : `PowerPoint を保存（${result.slides.length}枚）`}
       </button>
       {folderSupported ? (
         <p className="hint save-hint">
@@ -136,7 +143,7 @@ function PhotoStatus({ result, progress }: { result: GenerateResponse; progress:
       <p className="waiting form-message" aria-live="polite">
         <span className="spinner" aria-hidden="true" />
         写真を AI で作っています（{progress.done + progress.failed}/{progress.total}）。1〜3分ほどかかります。
-        この間に保存すると、まだできていない写真は点線の枠になります。
+        写真ができあがると、保存ボタンを押せるようになります。
       </p>
     );
   }
@@ -155,7 +162,7 @@ export default function SlideResult({ result, photoProgress }: { result: Generat
         {result.input.year}年{result.input.month}月（{result.input.season}）・POM「{result.input.pom}」
       </h2>
 
-      <SavePptx result={result} />
+      <SavePptx result={result} photoProgress={photoProgress} />
 
       {result.issues.length > 0 && (
         <div className="check check-warn" role="alert">
