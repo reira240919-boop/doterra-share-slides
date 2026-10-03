@@ -2,7 +2,7 @@
 // private/products/ に置く（URL では開けない）。
 //   phossil-group.png     … PHOSSILミネラルのボトル 5 本（横長の枠に使う）
 //   phossil-single.png    … 上の写真から 1 本だけ切り抜いたもの（縦長・正方形の枠に使う）
-//   wellness-pyramid.png  … ドテラ ウェルネスピラミッドの図（以前のミネラル資料から切り抜き）
+//   wellness-pyramid.png  … ドテラ ウェルネスピラミッドの図（「健康の土台は、まずミネラルから。」の見出し付き・背景は透明）
 
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -30,7 +30,7 @@ export function isPhossilPhoto(desc: string): boolean {
 }
 
 export async function pyramidImage(): Promise<DeckImage | null> {
-  return load("wellness-pyramid.png", 1115 / 693);
+  return load("wellness-pyramid.png", 1335 / 1178);
 }
 
 // ミネラルのページに、ボトルの公式写真とウェルネスピラミッドの図を付ける
