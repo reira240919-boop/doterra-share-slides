@@ -1,7 +1,6 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { aiPhotosEnabled, generatePhoto } from "@/lib/ai-photo";
-import { getAuthState } from "@/lib/auth";
 import { IS_MINE } from "@/lib/mode";
 
 // 写真 1 枚を AI で作る。スライドの文章ができたあと、画面から枠ごとに呼ぶ
@@ -11,9 +10,6 @@ export const maxDuration = 150;
 export async function POST(request: Request) {
   // 見本（公開用）では写真を作らない
   if (!IS_MINE) return NextResponse.json({ error: "見本では写真を作りません。" }, { status: 404 });
-  if ((await getAuthState()) !== "unlocked") {
-    return NextResponse.json({ error: "合言葉の確認が切れています。ページを開き直してください。" }, { status: 401 });
-  }
   if (!aiPhotosEnabled()) {
     return NextResponse.json({ error: "写真を作る AI の設定（OPENAI_API_KEY）が入っていません。" }, { status: 503 });
   }

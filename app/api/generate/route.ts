@@ -1,6 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
-import { getAuthState } from "@/lib/auth";
 import { aiPhotosEnabled } from "@/lib/ai-photo";
 import type { DeckSlide } from "@/lib/deck";
 import { attachMineralImages } from "@/lib/products";
@@ -17,20 +16,6 @@ import sampleDeck from "@/data/sample-deck.json";
 export const maxDuration = 300;
 
 export async function POST(request: Request) {
-  const auth = await getAuthState();
-  if (auth === "not-configured") {
-    return NextResponse.json(
-      { error: "合言葉がまだ設定されていないため、スライドは作れません。" },
-      { status: 503 },
-    );
-  }
-  if (auth === "locked") {
-    return NextResponse.json(
-      { error: "合言葉の確認が切れています。ページを開き直して、合言葉を入れてください。" },
-      { status: 401 },
-    );
-  }
-
   const body = await request.json().catch(() => null);
   const result = validateSlideInput(body ?? {}, yearOptions());
   if (!result.ok) {
