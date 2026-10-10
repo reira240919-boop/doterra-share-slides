@@ -9,7 +9,7 @@
 `NEXT_PUBLIC_DATA_MODE=mine` のときだけ自分用（`lib/mode.ts` の `IS_MINE`）。案件一覧表と同じ分け方。
 
 - 自分用：`127.0.0.1` だけで起動。合言葉なし。AI で本当にスライドと写真を作る。`distDir` は `.next-mine`
-- 公開用（Vercel）：合言葉のあと、`data/sample-deck.json`（9 月の見本）を返すだけ。AI・資料・キーは使わない。Vercel に `NEXT_PUBLIC_DATA_MODE` を設定しないこと
+- 公開用（Vercel）：合言葉なし。`data/sample-deck.json`（9 月の見本）を返すだけ。AI・資料・キーは使わない。Vercel に `NEXT_PUBLIC_DATA_MODE` を設定しないこと
 - 自分用はログイン時に自動で起動している：`~/Library/LaunchAgents/com.m39.doterra-slides-mine.plist`（`npm run start:mine` を 3201 で実行し、止まったら起動し直す）。ログは `~/Library/Logs/doterra-slides-mine.*.log`。止める：`launchctl bootout gui/$(id -u)/com.m39.doterra-slides-mine`
 
 ## コマンド
